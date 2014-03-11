@@ -1,0 +1,316 @@
+import java.applet.Applet;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.util.LinkedList;
+
+import javax.swing.*;
+
+public class Paint extends Applet implements MouseMotionListener,
+		MouseListener, ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private Button Elipse, Cuadro, Linea, Lapiz,Texto, Color, Borrar,Borrador,Deshacer,Triangulo;
+	private String accion = "";
+	private java.awt.Color color;
+	private LinkedList<Point> p=null, b=null;
+	private LinkedList<java.awt.Color> c=null;
+	private LinkedList<Figura> h = null;
+	private Point punto1 = null, punto2 = null;
+	int tamano_x, tamano_y, x, y;
+	private Image imgInv;
+	private Graphics graphInv;
+	private Dimension dimInv;
+	private Dimension d = getSize();
+	
+	
+	
+
+	public void init() {
+		setSize(800, 600);
+		Elipse = new Button("Elipse");
+		Cuadro = new Button("Cuadro");
+		Linea = new Button("Línea");
+		Lapiz = new Button("Lápiz");
+		Texto = new Button("Texto");
+		Color = new Button("Color");
+		Borrador = new Button("Borrador");
+		Borrar = new Button("Borrar Todo");
+		Borrar.setBackground(new Color(250,0,50));
+		Triangulo = new Button("Triangulo");
+		Deshacer = new Button("Deshacer última acción");
+		add(Elipse);
+		add(Cuadro);
+		add(Triangulo);
+		add(Linea);
+		add(Lapiz);
+		add(Texto);
+		add(Color);
+		add(Borrador);
+		add(Borrar);
+		add(Deshacer);
+		Elipse.addActionListener(this);
+		Cuadro.addActionListener(this);
+		Linea.addActionListener(this);
+		Lapiz.addActionListener(this);
+		Texto.addActionListener(this);
+		Color.addActionListener(this);
+		Borrador.addActionListener(this);
+		Borrar.addActionListener(this);
+		Deshacer.addActionListener(this);
+		Triangulo.addActionListener(this);
+		addMouseMotionListener(this);
+		addMouseListener(this);
+		punto1 = new Point();
+		punto2 = new Point();
+		p = new LinkedList<Point>();
+		b = new LinkedList<Point>();
+		h = new LinkedList<Figura>();
+		c = new LinkedList<java.awt.Color>();
+	}
+	
+	public void paint(Graphics g) {
+		super.paint(g);
+		dibujo(g);
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent arg0) {
+		if (accion == "lapiz") {
+			p.add(arg0.getPoint());
+			c.add(color);
+		}
+		if(accion == "borrador"){
+			b.add(arg0.getPoint());
+		}
+		if(!h.isEmpty() && h.getLast().getFigura()!="texto")
+			{h.removeLast();}
+		punto2 = arg0.getPoint();
+		if(accion!="texto")
+			{h.add(new Figura(accion, punto1, punto2, color));
+			repaint();
+			}
+		
+		
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent arg0) {
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		punto1 = arg0.getPoint();
+		if(accion == "texto"){
+			String texto=JOptionPane.showInputDialog("Ingrese el texto que desee");
+			h.add(new Figura(accion,punto1,color,texto));
+			repaint();
+			accion=null;
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		punto2 = arg0.getPoint();
+			if (punto1 != null && punto2 != null && accion!=null) {
+			h.add(new Figura(accion, punto1, punto2, color));
+		}
+		punto1 = null;
+		punto2 = null;
+		
+		repaint();
+	}
+	
+	public void update(Graphics g){
+		// se comprueba si existe el objeto invisible y si sus dimensiones son correctas
+		 if ((graphInv==null) || (d.width!=dimInv.width) || (d.height!=dimInv.height)) {
+		 dimInv = d;
+		 // se llama al método createImage de la clase Component
+		 imgInv = createImage(1366,768);
+		 // se llama al método getGraphics de la clase Image
+		 graphInv = imgInv.getGraphics();
+		 }
+		 // se establecen las propiedades del contexto gráfico invisible,
+		 // y se dibuja sobre él
+		 graphInv.setColor(getBackground());
+		 // finalmente se hace visible la imagen invisible a partir del punto (0, 0)
+		 // utilizando el propio panel como ImageObserver
+		 
+		 g.drawImage(imgInv, 0, 0, this);
+		 dibujo(g);
+		 //paint(g);
+		 
+	}
+	
+	private void dibujo(Graphics g) {
+		for (Figura F : h) {
+			if (F.getFigura() != null) {
+				int width=0;
+				int height=0;
+				
+				if(F.getFigura() != "texto"){
+					x = CalculaX(F);
+					y = CalculaY(F);
+					width= F.getTamx();
+					height = F.getTamy();
+					}
+				
+				g.setColor(F.getColor());
+
+				switch (F.getFigura()) {
+				case "elipse":
+					g.fillOval(x, y, width, height);
+					break;
+				case "cuadro":
+					g.fillRect(x, y, width, height);
+					break;
+				case "linea":
+					g.drawLine(F.getX1(), F.getY1(), F.getX2(), F.getY2());
+					break;
+				case "texto":
+					g.drawString(F.getTexto(),F.getX1(),F.getY1());
+					break;
+				case "lapiz":
+					int i = 0;
+					for (Point n : p) {
+						g.setColor(c.get(i));
+						g.fillOval(n.x, n.y, 5, 5);
+						i++;}					
+					break;
+				case "borrador":
+					for(Point B : b){	g.clearRect(B.x,B.y,10,10);	}
+					break;
+				case "borrar":
+					g.clearRect(0, 100, 1024, 768);
+					accion = null;
+					break;
+				case "triangulo":
+					int izquierdax,izquierday,centrox,centroy,derechax,derechay;
+					if(F.getX1()>F.getX2()){
+						derechax=F.getX1();
+						izquierdax=F.getX2();
+						centrox=(F.getX1()+F.getX2())/2;
+					}
+					else{
+						derechax=F.getX2();
+						izquierdax=F.getX1();
+						centrox=(F.getX1()+F.getX2())/2;
+					}
+					if(F.getY1()>F.getY2()){
+						derechay=izquierday=F.getY1();
+						centroy=F.getY2();
+					}
+					else{
+						derechay=izquierday=F.getY2();
+						centroy=F.getY1();
+					}
+						
+					int xp[]={izquierdax, centrox, derechax};
+					int yp[]={izquierday,centroy,derechay};
+					g.fillPolygon(xp, yp, 3);
+					break;
+				case "deshacer":
+					accion=null;
+					
+					break;
+				default:
+					break;
+					
+				}
+				System.out.println(h.size());
+			}
+		}
+		
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent arg0) {
+		switch (arg0.getActionCommand()) {
+		case "Elipse":
+			accion = "elipse";
+			break;
+		case "Cuadro":
+			accion = "cuadro";
+			break;
+		case "Línea":
+			accion = "linea";
+			break;
+		case "Lápiz":
+			accion = "lapiz";
+			break;
+		case "Color":
+			color = JColorChooser.showDialog(this,"Escoja un color (:", null);
+			break;
+		case "Borrar Todo":
+			accion = "borrar";
+			p.clear();
+			h.clear();
+			c.clear();
+			break;
+		case "Texto":
+			accion="texto";
+			break;
+		case "Borrador":
+			accion="borrador";
+			break;
+		case "Deshacer última acción":
+			accion="deshacer";
+			if(!h.isEmpty()){
+				h.removeLast();
+				repaint();
+				}
+			else {JOptionPane.showMessageDialog(null,"Ya no hay acciones que deshacer.","AVISO!",JOptionPane.WARNING_MESSAGE);}
+			break;
+		case "Triangulo":
+			accion="triangulo";
+			break;
+		default:
+			JOptionPane.showMessageDialog(null, "Botón no configurado");
+			break;
+		}
+		repaint();
+	}
+
+	public int CalculaX(Figura F) {
+		int x;
+		if (F.getX1() > F.getX2()) {
+			x = F.getX2();
+		} else {
+			x = F.getX1();
+		}
+		return x;
+	}
+
+	public int CalculaY(Figura F) {
+		int y;
+		if (F.getY1() < F.getY2()) {
+			y = F.getY1();
+		} else {
+			y = F.getY2();
+		}
+		return y;
+	}
+
+}
