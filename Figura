@@ -1,0 +1,148 @@
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+
+public class Figura {
+
+	//Atributos
+	private int tamx, tamy;
+	private Point inicio, fin;
+	private Color color;
+	private String figura,texto;
+	
+	
+	//Constructores
+	
+	public Figura(String figura, Point inicio, Point fin, Color color) {
+		this.figura = figura;
+		this.inicio = inicio;
+		this.fin = fin;
+		this.tamx = tamanox(inicio, fin);
+		this.tamy = tamanoy(inicio, fin);
+		this.color = color;
+	}
+	
+	public Figura(String figura, Point inicio, Point fin, Color color,String texto) {
+		this.figura = figura;
+		this.inicio = inicio;
+		this.fin = fin;
+		this.tamx = tamanox(inicio, fin);
+		this.tamy = tamanoy(inicio, fin);
+		this.color = color;
+		this.texto = texto;
+	}
+
+	public Figura(String figura, Point punto1, Color color,String texto) {
+		this.figura = figura;
+		this.inicio = punto1;
+		this.color = color;
+		this.texto = texto;
+		
+	}
+
+	
+	//Métodos
+	
+	public int tamanox(Point punto1, Point punto2) {
+		int tamx;
+		if(punto1.x==punto2.x){
+			return 1;
+		}else{
+			tamx = punto1.x - punto2.x;
+			if (tamx < 0) {
+				tamx *= -1;
+			}
+			return tamx;	
+		}
+		
+	}
+
+	public int tamanoy(Point punto1, Point punto2) {
+		int tamy;
+		if(punto1.y==punto2.y){
+			return 1;
+		}else{
+			tamy = punto1.y - punto2.y;
+			if (tamy < 0) {
+				tamy *= -1;
+			}
+			return tamy;	
+		}
+		
+	}
+
+	
+	//Encapsulamientos
+	public int getX1() {
+		return inicio.x;
+	}
+
+	public int getX2() {
+		return fin.x;
+	}
+
+	public int getY1() {
+		return inicio.y;
+	}
+
+	public int getY2() {
+		return fin.y;
+	}
+
+	public String getFigura() {
+		return figura;
+	}
+
+	public int getTamx() {
+		return tamx;
+	}
+
+	public void setTamx(int tamx) {
+		this.tamx = tamx;
+	}
+
+	public int getTamy() {
+		return tamy;
+	}
+
+	public void setTamy(int tamy) {
+		this.tamy = tamy;
+	}
+
+	public Point getInicio() {
+		return inicio;
+	}
+
+	public void setInicio(Point inicio) {
+		this.inicio = inicio;
+	}
+
+	public Point getFin() {
+		return fin;
+	}
+
+	public void setFin(Point fin) {
+		this.fin = fin;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public void setFigura(String figura) {
+		this.figura = figura;
+	}
+	
+	public String getTexto() {
+		return texto;
+	}
+
+	public void setTexto(String texto) {
+		this.texto = texto;
+	}
+
+}
